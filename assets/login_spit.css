@@ -1,0 +1,23 @@
+/* Split Screen Login Styles - Dark Theme */
+
+/* Dark input focus effects */
+.login-input-dark:focus {
+    border-color: #FFB400 !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 180, 0, 0.25) !important;
+    background-color: #2d2d2d !important;
+    outline: none !important;
+}
+
+/* Dark button hover effect */
+.login-button-dark:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 180, 0, 0.6) !important;
+    background: linear-gradient(135deg, #ffd700 0%, #FFB400 100%) !important;
+}
+
+.login-button-dark:active {
+    transform: translateY(0px);
+}
+
+/* FontAwesome icons */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
