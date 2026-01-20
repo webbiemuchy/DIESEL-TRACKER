@@ -147,7 +147,7 @@ def create_login_page():
                     'position': 'relative',
                     'overflow': 'hidden'
                 })
-            ], md=6, xs=0, style={'padding': '0'}, className='d-none d-md-block'),
+            ], md=7, xs=0, style={'padding': '0'}, className='d-none d-md-block'),
             
             # Right side - Dark login panel (full screen on mobile)
             dbc.Col([
@@ -271,7 +271,7 @@ def create_login_page():
                     'padding': '40px',
                     'width': '100%'
                 })
-            ], md=6, xs=12, style={
+            ], md=5, xs=12, style={
                 'padding': '0',
                 'backgroundColor': COLORS['bg_dark'],
                 'display': 'flex',
