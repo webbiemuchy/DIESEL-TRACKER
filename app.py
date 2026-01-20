@@ -64,17 +64,9 @@ def create_login_page():
     
     return html.Div([
         dbc.Row([
+            # Left side - Dark decorative panel (hidden on mobile)
             dbc.Col([
                 html.Div([
-                    # Logo at top
-                    html.Div([
-                        html.Img(src=logo_src, style={
-                            'width': '350px',
-                            'marginBottom': '30px',
-                            'filter': f'drop-shadow(0 0 30px rgba(255, 180, 0, 0.6))'
-                        }) if logo_src else None,
-                    ], style={'textAlign': 'center', 'marginBottom': '20px'}),
-                    
                     # Decorative geometric shapes
                     html.Div([
                         # Shape 1 - diagonal bar
@@ -155,11 +147,21 @@ def create_login_page():
                     'position': 'relative',
                     'overflow': 'hidden'
                 })
-            ], md=6, style={'padding': '0'}),
+            ], md=6, xs=0, style={'padding': '0'}, className='d-none d-md-block'),
             
-            # Right side - Dark login panel
+            # Right side - Dark login panel (full screen on mobile)
             dbc.Col([
                 html.Div([
+                    # Logo at top of login form
+                    html.Div([
+                        html.Img(src=logo_src, style={
+                            'width': '100%',
+                            'maxWidth': '280px',
+                            'marginBottom': '40px',
+                            'filter': f'drop-shadow(0 0 30px rgba(255, 180, 0, 0.6))'
+                        }) if logo_src else None,
+                    ], style={'textAlign': 'center'}),
+                    
                     # Login title
                     html.H2("USER LOGIN", style={
                         'color': COLORS['cat_yellow'],
@@ -266,9 +268,10 @@ def create_login_page():
                 ], style={
                     'maxWidth': '400px',
                     'margin': '0 auto',
-                    'padding': '40px'
+                    'padding': '40px',
+                    'width': '100%'
                 })
-            ], md=6, style={
+            ], md=6, xs=12, style={
                 'padding': '0',
                 'backgroundColor': COLORS['bg_dark'],
                 'display': 'flex',
@@ -280,7 +283,8 @@ def create_login_page():
     ], style={
         'margin': '0',
         'padding': '0',
-        'overflow': 'hidden'
+        'overflow': 'hidden',
+        'backgroundColor': COLORS['bg_dark']
     })
 
 # ==================== HEADER COMPONENT ====================
@@ -891,10 +895,14 @@ def create_users_tab(user_data):
 
 # ==================== DELETE CONFIRMATION MODAL ====================
 delete_modal = dbc.Modal([
-    dbc.ModalHeader("⚠️ Confirm Deletion"),
+    dbc.ModalHeader("⚠️ Confirm Deletion", style={
+        'backgroundColor': COLORS['carbon'],
+        'color': COLORS['cat_yellow'],
+        'borderBottom': f"2px solid {COLORS['cat_yellow']}"
+    }),
     dbc.ModalBody([
         html.P(id="delete-modal-text", style={'color': COLORS['text_bright'], 'fontSize': '1.1rem'}),
-        html.Hr(),
+        html.Hr(style={'borderColor': '#333'}),
         html.P("For security, enter an admin password to confirm:", 
                style={'color': COLORS['cat_yellow'], 'fontWeight': 'bold', 'marginTop': '20px'}),
         dbc.Input(
@@ -904,12 +912,143 @@ delete_modal = dbc.Modal([
             style={**INPUT_STYLE, 'fontSize': '1rem'}
         ),
         html.Div(id="delete-error", style={'marginTop': '10px'})
-    ]),
+    ], style={'backgroundColor': COLORS['bg_dark'], 'color': COLORS['text_bright']}),
     dbc.ModalFooter([
         dbc.Button("Cancel", id="cancel-delete-btn", color="secondary", n_clicks=0),
         dbc.Button("Delete", id="confirm-delete-btn", n_clicks=0, style=BUTTON_DANGER)
-    ])
-], id="delete-modal", is_open=False, backdrop="static")
+    ], style={'backgroundColor': COLORS['carbon'], 'borderTop': f"1px solid #333"})
+], id="delete-modal", is_open=False, backdrop="static", style={'color': COLORS['text_bright']})
+
+# ==================== EDIT REFUEL MODAL ====================
+edit_refuel_modal = dbc.Modal([
+    dbc.ModalHeader("✏️ Edit Refuel Entry", style={
+        'backgroundColor': COLORS['carbon'],
+        'color': COLORS['cat_yellow'],
+        'borderBottom': f"2px solid {COLORS['cat_yellow']}"
+    }),
+    dbc.ModalBody([
+        dbc.Row([
+            dbc.Col([
+                dbc.Label("Machine ID", style={'color': COLORS['text_bright']}),
+                dbc.Input(id="edit-refuel-machine", disabled=True, style=INPUT_STYLE)
+            ], md=6),
+            dbc.Col([
+                dbc.Label("Operator", style={'color': COLORS['text_bright']}),
+                dbc.Input(id="edit-refuel-operator", disabled=True, style=INPUT_STYLE)
+            ], md=6)
+        ], className="mb-3"),
+        dbc.Row([
+            dbc.Col([
+                dbc.Label("Usage (Hours)", style={'color': COLORS['text_bright']}),
+                dbc.Input(id="edit-refuel-usage", type="number", step=0.1, style=INPUT_STYLE)
+            ], md=6),
+            dbc.Col([
+                dbc.Label("Fuel (Liters)", style={'color': COLORS['text_bright']}),
+                dbc.Input(id="edit-refuel-fuel", type="number", step=0.1, style=INPUT_STYLE)
+            ], md=6)
+        ], className="mb-3"),
+        dbc.Row([
+            dbc.Col([
+                dbc.Label("Notes", style={'color': COLORS['text_bright']}),
+                dbc.Textarea(id="edit-refuel-notes", style=INPUT_STYLE, rows=2)
+            ])
+        ], className="mb-3"),
+        html.Hr(style={'borderColor': '#333'}),
+        html.P("For security, enter admin password to confirm changes:", 
+               style={'color': COLORS['cat_yellow'], 'fontWeight': 'bold'}),
+        dbc.Input(
+            id="edit-admin-password-input",
+            type="password",
+            placeholder="Admin password required",
+            style={**INPUT_STYLE, 'fontSize': '1rem'}
+        ),
+        html.Div(id="edit-error", style={'marginTop': '10px'})
+    ], style={'backgroundColor': COLORS['bg_dark'], 'color': COLORS['text_bright']}),
+    dbc.ModalFooter([
+        dbc.Button("Cancel", id="cancel-edit-btn", color="secondary", n_clicks=0),
+        dbc.Button("Save Changes", id="confirm-edit-btn", n_clicks=0, style=BUTTON_PRIMARY)
+    ], style={'backgroundColor': COLORS['carbon'], 'borderTop': f"1px solid #333"})
+], id="edit-refuel-modal", is_open=False, backdrop="static", style={'color': COLORS['text_bright']})
+
+# ==================== EDIT USER MODAL ====================
+edit_user_modal = dbc.Modal([
+    dbc.ModalHeader("✏️ Edit User", style={
+        'backgroundColor': COLORS['carbon'],
+        'color': COLORS['cat_yellow'],
+        'borderBottom': f"2px solid {COLORS['cat_yellow']}"
+    }),
+    dbc.ModalBody([
+        dbc.Row([
+            dbc.Col([
+                dbc.Label("Username", style={'color': COLORS['text_bright']}),
+                dbc.Input(id="edit-user-username", disabled=True, style=INPUT_STYLE)
+            ], md=6),
+            dbc.Col([
+                dbc.Label("Full Name", style={'color': COLORS['text_bright']}),
+                dbc.Input(id="edit-user-fullname", type="text", style=INPUT_STYLE)
+            ], md=6)
+        ], className="mb-3"),
+        dbc.Row([
+            dbc.Col([
+                dbc.Label("Email", style={'color': COLORS['text_bright']}),
+                dbc.Input(id="edit-user-email", type="email", style=INPUT_STYLE)
+            ], md=6),
+            dbc.Col([
+                dbc.Label("Role", style={'color': COLORS['text_bright']}),
+                dcc.Dropdown(
+                    id='edit-user-role',
+                    options=[
+                        {'label': '🔑 Admin', 'value': 'admin'},
+                        {'label': '👔 Manager', 'value': 'manager'},
+                        {'label': '✍️ Data Entry', 'value': 'data_entry'},
+                        {'label': '👁️ Viewer', 'value': 'viewer'}
+                    ],
+                    style={'color': '#000'}
+                )
+            ], md=6)
+        ], className="mb-3"),
+        dbc.Row([
+            dbc.Col([
+                dbc.Label("Status", style={'color': COLORS['text_bright']}),
+                dcc.Dropdown(
+                    id='edit-user-status',
+                    options=[
+                        {'label': '✅ Active', 'value': 1},
+                        {'label': '❌ Inactive', 'value': 0}
+                    ],
+                    style={'color': '#000'}
+                )
+            ], md=6)
+        ], className="mb-3"),
+        html.Hr(style={'borderColor': '#333'}),
+        html.H6("Change Password (Optional)", style={'color': COLORS['cat_yellow'], 'marginBottom': '10px'}),
+        html.P("Leave blank to keep current password", style={'color': COLORS['text_dim'], 'fontSize': '0.85rem'}),
+        dbc.Row([
+            dbc.Col([
+                dbc.Label("New Password", style={'color': COLORS['text_bright']}),
+                dbc.Input(id="edit-user-new-password", type="password", placeholder="Leave blank to keep current", style=INPUT_STYLE)
+            ], md=6),
+            dbc.Col([
+                dbc.Label("Confirm Password", style={'color': COLORS['text_bright']}),
+                dbc.Input(id="edit-user-confirm-password", type="password", placeholder="Confirm new password", style=INPUT_STYLE)
+            ], md=6)
+        ], className="mb-3"),
+        html.Hr(style={'borderColor': '#333'}),
+        html.P("For security, enter admin password to confirm changes:", 
+               style={'color': COLORS['cat_yellow'], 'fontWeight': 'bold'}),
+        dbc.Input(
+            id="edit-user-admin-password",
+            type="password",
+            placeholder="Admin password required",
+            style={**INPUT_STYLE, 'fontSize': '1rem'}
+        ),
+        html.Div(id="edit-user-error", style={'marginTop': '10px'})
+    ], style={'backgroundColor': COLORS['bg_dark'], 'color': COLORS['text_bright']}),
+    dbc.ModalFooter([
+        dbc.Button("Cancel", id="cancel-edit-user-btn", color="secondary", n_clicks=0),
+        dbc.Button("Save Changes", id="confirm-edit-user-btn", n_clicks=0, style=BUTTON_PRIMARY)
+    ], style={'backgroundColor': COLORS['carbon'], 'borderTop': f"1px solid #333"})
+], id="edit-user-modal", is_open=False, backdrop="static", style={'color': COLORS['text_bright']})
 
 # ==================== MAIN APP LAYOUT ====================
 def create_main_app(user_data):
@@ -927,10 +1066,14 @@ def create_main_app(user_data):
         
         # Modals
         delete_modal,
+        edit_refuel_modal,
+        edit_user_modal,
         
         # Hidden stores
         dcc.Store(id='user-store'),
         dcc.Store(id='delete-confirmation-store'),
+        dcc.Store(id='edit-refuel-store'),
+        dcc.Store(id='edit-user-store'),
         dcc.Interval(id='refresh-interval', interval=30000, n_intervals=0)
     ], style={'background': COLORS['bg_dark']})
 
@@ -1188,14 +1331,16 @@ def render_refueling_table(filter_type='today'):
     
     # Create status column
     def get_status(row):
-        if abs(row['variance_pct']) > tolerance:
+        # Only flag positive variance (over-usage) as anomaly
+        if row['variance_pct'] > tolerance:
             return f"⚠️ ANOMALY ({row['variance_pct']:+.1f}%)"
         return f"✅ NORMAL ({row['variance_pct']:+.1f}%)"
     
     display_df['status'] = display_df.apply(get_status, axis=1)
     
-    # Create table columns
+    # Create table columns with ID column for actions
     columns = [
+        {'name': 'ID', 'id': 'id'},
         {'name': 'Date/Time', 'id': 'datetime_str'},
         {'name': 'Machine', 'id': 'machine_id'},
         {'name': 'Model', 'id': 'machine_model'},
@@ -1207,12 +1352,6 @@ def render_refueling_table(filter_type='today'):
         {'name': 'Status', 'id': 'status'},
     ]
     
-    if can_delete:
-        columns.append({'name': 'Actions', 'id': 'actions', 'presentation': 'markdown'})
-        display_df['actions'] = display_df['id'].apply(
-            lambda x: f'<button id="{{"type": "delete-refuel", "index": "{x}"}}" style="background: {COLORS["danger"]}; color: white; border: none; padding: 4px 12px; border-radius: 3px; cursor: pointer;">Delete</button>'
-        )
-    
     # Create custom style_data_conditional for refueling table
     refuel_style_conditional = [
         {
@@ -1221,7 +1360,7 @@ def render_refueling_table(filter_type='today'):
         },
         {
             'if': {
-                'filter_query': '{variance_pct} > ' + str(tolerance) + ' || {variance_pct} < -' + str(tolerance),
+                'filter_query': '{variance_pct} > ' + str(tolerance),
                 'column_id': 'status'
             },
             'backgroundColor': 'rgba(255, 77, 77, 0.2)',
@@ -1230,16 +1369,51 @@ def render_refueling_table(filter_type='today'):
         }
     ]
     
+    # Hide ID column but keep it in data
     table = dash_table.DataTable(
         data=display_df.to_dict('records'),
         columns=columns,
         style_table=TABLE_STYLE['style_table'],
         style_header=TABLE_STYLE['style_header'],
         style_cell=TABLE_STYLE['style_cell'],
-        style_data_conditional=refuel_style_conditional,
+        style_data_conditional=refuel_style_conditional + [
+            {
+                'if': {'column_id': 'id'},
+                'display': 'none'
+            }
+        ],
         page_size=20,
-        sort_action='native'
+        sort_action='native',
+        row_selectable='single' if can_delete else False,
+        selected_rows=[],
+        id='refueling-data-table'
     )
+    
+    # Create action buttons for selected row if user has permission
+    if can_delete:
+        action_section = html.Div([
+            html.Div(id='selected-refuel-info', style={'marginTop': '15px', 'marginBottom': '10px'}),
+            html.Div([
+                dbc.Button(
+                    "✏️ Edit Selected Entry",
+                    id='edit-selected-refuel-btn',
+                    size='sm',
+                    color='warning',
+                    className='me-2',
+                    disabled=True
+                ),
+                dbc.Button(
+                    "🗑️ Delete Selected Entry",
+                    id='delete-selected-refuel-btn',
+                    size='sm',
+                    style=BUTTON_DANGER,
+                    disabled=True
+                )
+            ], style={'marginBottom': '15px'}),
+            dcc.Store(id='selected-refuel-id-store')
+        ])
+    else:
+        action_section = html.Div()
     
     # Summary stats with improved styling
     summary = html.Div([
@@ -1273,7 +1447,7 @@ def render_refueling_table(filter_type='today'):
             dbc.Col([
                 html.Div([
                     html.Strong("Anomalies Detected", style={'color': COLORS['text_dim'], 'fontSize': '0.85rem', 'display': 'block'}),
-                    html.Span(str((df['variance_pct'].abs() > tolerance).sum()), 
+                    html.Span(str((df['variance_pct'] > tolerance).sum()), 
                              style={'color': COLORS['danger'], 'fontSize': '1.8rem', 'fontWeight': 'bold'})
                 ], style={'textAlign': 'center', 'padding': '20px', 'background': '#0a0a0a', 'borderRadius': '4px', 'border': f"1px solid {COLORS['danger']}"})
             ], md=2)
@@ -1281,7 +1455,7 @@ def render_refueling_table(filter_type='today'):
     ], style={'marginTop': '20px'})
     
     return dbc.Card([
-        dbc.CardBody([table, summary])
+        dbc.CardBody([table, action_section, summary])
     ], style=CARD_STYLE)
 
 # ==================== FLEET CALLBACKS ====================
@@ -1600,7 +1774,7 @@ def update_analytics(n_clicks, date_from, date_to):
     total_fuel = filtered_df['fuel'].sum()
     expected_fuel = filtered_df['expected_fuel'].sum()
     total_usage = filtered_df['usage'].sum()
-    anomalies = (filtered_df['variance_pct'].abs() > tolerance).sum()
+    anomalies = (filtered_df['variance_pct'] > tolerance).sum()
     avg_efficiency = filtered_df['efficiency'].mean()
     
     # KPI Cards with improved styling
@@ -2223,12 +2397,181 @@ def update_users_tables(n):
     """Update users and audit log tables"""
     return render_users_table(), render_audit_log()
 
+# ==================== EDIT USER CALLBACKS ====================
+
+# Handle user row selection and enable edit button
+@app.callback(
+    [Output('selected-user-info', 'children'),
+     Output('edit-selected-user-btn', 'disabled'),
+     Output('selected-user-id-store', 'data')],
+    [Input('users-data-table', 'selected_rows'),
+     Input('users-data-table', 'data')],
+    prevent_initial_call=False
+)
+def update_selected_user(selected_rows, table_data):
+    """Update edit button based on row selection"""
+    if not selected_rows or not table_data:
+        return '', True, None
+    
+    selected_row_idx = selected_rows[0]
+    selected_data = table_data[selected_row_idx]
+    
+    info = html.Div([
+        html.Strong("Selected User: ", style={'color': COLORS['text_dim']}),
+        html.Span(f"{selected_data['username']} ({selected_data['full_name']}) - ", 
+                 style={'color': COLORS['text_bright']}),
+        html.Span(f"{selected_data['role']}", 
+                 style={'color': COLORS['cat_yellow']})
+    ], style={'padding': '10px', 'background': '#0a0a0a', 'borderRadius': '4px', 'border': f"1px solid {COLORS['cat_yellow']}"})
+    
+    return info, False, selected_data['id']
+
+# Open edit user modal
+@app.callback(
+    [Output('edit-user-modal', 'is_open', allow_duplicate=True),
+     Output('edit-user-username', 'value'),
+     Output('edit-user-fullname', 'value'),
+     Output('edit-user-email', 'value'),
+     Output('edit-user-role', 'value'),
+     Output('edit-user-status', 'value'),
+     Output('edit-user-store', 'data')],
+    Input('edit-selected-user-btn', 'n_clicks'),
+    State('selected-user-id-store', 'data'),
+    prevent_initial_call=True
+)
+def open_edit_user_modal(n_clicks, user_id):
+    """Open edit user modal with current data"""
+    if not n_clicks or not user_id:
+        raise PreventUpdate
+    
+    # Fetch current user data
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT id, username, full_name, email, role, active
+        FROM users
+        WHERE id = ?
+    ''', (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+    
+    if not user:
+        raise PreventUpdate
+    
+    return (True, user['username'], user['full_name'], user['email'] or '', 
+            user['role'], user['active'], {'id': user_id})
+
+# Confirm edit user
+@app.callback(
+    [Output('edit-user-modal', 'is_open', allow_duplicate=True),
+     Output('edit-user-error', 'children'),
+     Output('edit-user-admin-password', 'value'),
+     Output('edit-user-new-password', 'value'),
+     Output('edit-user-confirm-password', 'value'),
+     Output('users-table-container', 'children', allow_duplicate=True),
+     Output('users-data-table', 'selected_rows', allow_duplicate=True)],
+    Input('confirm-edit-user-btn', 'n_clicks'),
+    [State('edit-user-admin-password', 'value'),
+     State('edit-user-fullname', 'value'),
+     State('edit-user-email', 'value'),
+     State('edit-user-role', 'value'),
+     State('edit-user-status', 'value'),
+     State('edit-user-new-password', 'value'),
+     State('edit-user-confirm-password', 'value'),
+     State('edit-user-store', 'data')],
+    prevent_initial_call=True
+)
+def confirm_edit_user(n_clicks, admin_password, fullname, email, role, status, 
+                     new_password, confirm_password, edit_data):
+    """Confirm and execute user edit"""
+    if not n_clicks or not edit_data:
+        raise PreventUpdate
+    
+    user_data = get_user_data()
+    if not user_data or not check_permission(user_data, 'users', 'write'):
+        return True, create_notification("❌ Permission denied", "danger"), '', '', '', dash.no_update, dash.no_update
+    
+    # Verify admin password
+    if not verify_admin_password(admin_password):
+        return True, create_notification("❌ Invalid admin password", "danger"), '', '', '', dash.no_update, dash.no_update
+    
+    # Validate inputs
+    if not fullname or not role or status is None:
+        return True, create_notification("❌ Please fill all required fields", "warning"), '', '', '', dash.no_update, dash.no_update
+    
+    # Validate password change if provided
+    if new_password or confirm_password:
+        if new_password != confirm_password:
+            return True, create_notification("❌ Passwords do not match", "warning"), '', '', '', dash.no_update, dash.no_update
+        if len(new_password) < 6:
+            return True, create_notification("❌ Password must be at least 6 characters", "warning"), '', '', '', dash.no_update, dash.no_update
+    
+    user_id = edit_data['id']
+    
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Update user details
+        permissions = json.dumps(ROLE_PERMISSIONS.get(role, {}))
+        
+        if new_password:
+            # Update with new password
+            cursor.execute('''
+                UPDATE users 
+                SET full_name = ?, email = ?, role = ?, permissions = ?, active = ?, password_hash = ?
+                WHERE id = ?
+            ''', (fullname, email or '', role, permissions, int(status), hash_password(new_password), user_id))
+            
+            log_audit(cursor, user_data['id'], user_data['username'], 'update', 'users', user_id,
+                     f"Updated user (including password): {fullname} - Role: {role}, Status: {'Active' if status else 'Inactive'}")
+        else:
+            # Update without changing password
+            cursor.execute('''
+                UPDATE users 
+                SET full_name = ?, email = ?, role = ?, permissions = ?, active = ?
+                WHERE id = ?
+            ''', (fullname, email or '', role, permissions, int(status), user_id))
+            
+            log_audit(cursor, user_data['id'], user_data['username'], 'update', 'users', user_id,
+                     f"Updated user: {fullname} - Role: {role}, Status: {'Active' if status else 'Inactive'}")
+        
+        conn.commit()
+        conn.close()
+        
+        # Return updated table and clear fields
+        return False, '', '', '', '', render_users_table(), []
+    except Exception as e:
+        return True, create_notification(f"❌ Error: {str(e)}", "danger"), '', '', '', dash.no_update, dash.no_update
+
+# Cancel edit user
+@app.callback(
+    [Output('edit-user-modal', 'is_open', allow_duplicate=True),
+     Output('edit-user-admin-password', 'value', allow_duplicate=True),
+     Output('edit-user-new-password', 'value', allow_duplicate=True),
+     Output('edit-user-confirm-password', 'value', allow_duplicate=True)],
+    Input('cancel-edit-user-btn', 'n_clicks'),
+    prevent_initial_call=True
+)
+def cancel_edit_user(n_clicks):
+    """Cancel user edit"""
+    if n_clicks:
+        return False, '', '', ''
+    raise PreventUpdate
+
 def render_users_table():
     """Render users table"""
+    user_data = get_user_data()
+    if not user_data:
+        return html.Div()
+    
+    can_edit = check_permission(user_data, 'users', 'write')
+    
     conn = get_db()
     df = pd.read_sql_query('''
         SELECT id, username, full_name, email, role, 
                CASE WHEN active=1 THEN 'Active' ELSE 'Inactive' END as status,
+               active,
                last_login
         FROM users 
         ORDER BY created_at DESC
@@ -2243,6 +2586,7 @@ def render_users_table():
     df['last_login'] = df['last_login'].fillna('Never')
     
     columns = [
+        {'name': 'ID', 'id': 'id'},
         {'name': 'Username', 'id': 'username'},
         {'name': 'Full Name', 'id': 'full_name'},
         {'name': 'Email', 'id': 'email'},
@@ -2264,6 +2608,14 @@ def render_users_table():
         {
             'if': {'filter_query': '{status} = "Active"', 'column_id': 'status'},
             'color': COLORS['success']
+        },
+        {
+            'if': {'column_id': 'id'},
+            'display': 'none'
+        },
+        {
+            'if': {'column_id': 'active'},
+            'display': 'none'
         }
     ]
     
@@ -2275,14 +2627,35 @@ def render_users_table():
         style_cell=TABLE_STYLE['style_cell'],
         style_data_conditional=users_style_conditional,
         page_size=10,
-        sort_action='native'
+        sort_action='native',
+        row_selectable='single' if can_edit else False,
+        selected_rows=[],
+        id='users-data-table'
     )
+    
+    # Create action buttons for selected user if permission exists
+    if can_edit:
+        action_section = html.Div([
+            html.Div(id='selected-user-info', style={'marginTop': '15px', 'marginBottom': '10px'}),
+            html.Div([
+                dbc.Button(
+                    "✏️ Edit Selected User",
+                    id='edit-selected-user-btn',
+                    size='sm',
+                    color='warning',
+                    disabled=True
+                )
+            ], style={'marginBottom': '15px'}),
+            dcc.Store(id='selected-user-id-store')
+        ])
+    else:
+        action_section = html.Div()
     
     return dbc.Card([
         dbc.CardHeader(
             html.H4("👥 User Accounts", style={'color': COLORS['cat_yellow'], 'margin': '0'})
         ),
-        dbc.CardBody([table])
+        dbc.CardBody([table, action_section])
     ], style=CARD_STYLE)
 
 def render_audit_log():
@@ -2405,6 +2778,159 @@ def confirm_delete(n_clicks, admin_password, delete_data):
 )
 def cancel_delete(n_clicks):
     """Cancel deletion"""
+    if n_clicks:
+        return False, ''
+    raise PreventUpdate
+
+# ==================== REFUELING TABLE SELECTION CALLBACKS ====================
+
+# Handle row selection and enable action buttons
+@app.callback(
+    [Output('selected-refuel-info', 'children'),
+     Output('edit-selected-refuel-btn', 'disabled'),
+     Output('delete-selected-refuel-btn', 'disabled'),
+     Output('selected-refuel-id-store', 'data')],
+    [Input('refueling-data-table', 'selected_rows'),
+     Input('refueling-data-table', 'data')],
+    prevent_initial_call=False
+)
+def update_selected_refuel(selected_rows, table_data):
+    """Update action buttons based on row selection"""
+    if not selected_rows or not table_data:
+        return '', True, True, None
+    
+    selected_row_idx = selected_rows[0]
+    selected_data = table_data[selected_row_idx]
+    
+    info = html.Div([
+        html.Strong("Selected Entry: ", style={'color': COLORS['text_dim']}),
+        html.Span(f"{selected_data['datetime_str']} - {selected_data['machine_id']} - {selected_data['operator_name']} ", 
+                 style={'color': COLORS['text_bright']}),
+        html.Span(f"({selected_data['usage']}hrs, {selected_data['fuel']}L)", 
+                 style={'color': COLORS['cat_yellow']})
+    ], style={'padding': '10px', 'background': '#0a0a0a', 'borderRadius': '4px', 'border': f"1px solid {COLORS['cat_yellow']}"})
+    
+    return info, False, False, selected_data['id']
+
+# Open edit modal from selected row button
+@app.callback(
+    [Output('edit-refuel-modal', 'is_open', allow_duplicate=True),
+     Output('edit-refuel-machine', 'value', allow_duplicate=True),
+     Output('edit-refuel-operator', 'value', allow_duplicate=True),
+     Output('edit-refuel-usage', 'value', allow_duplicate=True),
+     Output('edit-refuel-fuel', 'value', allow_duplicate=True),
+     Output('edit-refuel-notes', 'value', allow_duplicate=True),
+     Output('edit-refuel-store', 'data', allow_duplicate=True)],
+    Input('edit-selected-refuel-btn', 'n_clicks'),
+    State('selected-refuel-id-store', 'data'),
+    prevent_initial_call=True
+)
+def open_edit_from_button(n_clicks, refuel_id):
+    """Open edit modal from selected row button"""
+    if not n_clicks or not refuel_id:
+        raise PreventUpdate
+    
+    # Fetch current refuel data
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT r.id, r.machine_id, o.name as operator_name, r.usage, r.fuel, r.notes
+        FROM refuels r
+        JOIN operators o ON r.operator_id = o.id
+        WHERE r.id = ?
+    ''', (refuel_id,))
+    refuel = cursor.fetchone()
+    conn.close()
+    
+    if not refuel:
+        raise PreventUpdate
+    
+    return (True, refuel['machine_id'], refuel['operator_name'], 
+            refuel['usage'], refuel['fuel'], refuel['notes'] or '', 
+            {'id': refuel_id})
+
+# Open delete modal from selected row button
+@app.callback(
+    [Output('delete-modal', 'is_open', allow_duplicate=True),
+     Output('delete-modal-text', 'children', allow_duplicate=True),
+     Output('delete-confirmation-store', 'data', allow_duplicate=True)],
+    Input('delete-selected-refuel-btn', 'n_clicks'),
+    State('selected-refuel-id-store', 'data'),
+    prevent_initial_call=True
+)
+def open_delete_from_button(n_clicks, refuel_id):
+    """Open delete modal from selected row button"""
+    if not n_clicks or not refuel_id:
+        raise PreventUpdate
+    
+    return True, "Are you sure you want to delete this refuel entry?", {'type': 'refuel', 'id': refuel_id}
+
+# ==================== EDIT REFUEL MODAL CALLBACKS ====================
+
+# Confirm edit refuel
+@app.callback(
+    [Output('edit-refuel-modal', 'is_open', allow_duplicate=True),
+     Output('edit-error', 'children'),
+     Output('edit-admin-password-input', 'value'),
+     Output('refueling-table-container', 'children', allow_duplicate=True),
+     Output('refueling-data-table', 'selected_rows', allow_duplicate=True)],
+    Input('confirm-edit-btn', 'n_clicks'),
+    [State('edit-admin-password-input', 'value'),
+     State('edit-refuel-usage', 'value'),
+     State('edit-refuel-fuel', 'value'),
+     State('edit-refuel-notes', 'value'),
+     State('edit-refuel-store', 'data')],
+    prevent_initial_call=True
+)
+def confirm_edit_refuel(n_clicks, admin_password, usage, fuel, notes, edit_data):
+    """Confirm and execute refuel entry edit"""
+    if not n_clicks or not edit_data:
+        raise PreventUpdate
+    
+    user_data = get_user_data()
+    if not user_data:
+        return True, create_notification("❌ Not authenticated", "danger"), '', dash.no_update, dash.no_update
+    
+    # Verify admin password
+    if not verify_admin_password(admin_password):
+        return True, create_notification("❌ Invalid admin password", "danger"), '', dash.no_update, dash.no_update
+    
+    # Validate inputs
+    if not usage or not fuel or usage <= 0 or fuel <= 0:
+        return True, create_notification("❌ Usage and fuel must be greater than 0", "warning"), '', dash.no_update, dash.no_update
+    
+    refuel_id = edit_data['id']
+    
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            UPDATE refuels 
+            SET usage = ?, fuel = ?, notes = ?
+            WHERE id = ?
+        ''', (float(usage), float(fuel), notes or '', refuel_id))
+        
+        log_audit(cursor, user_data['id'], user_data['username'], 'update', 'refuels', refuel_id,
+                 f"Updated refuel entry - Usage: {usage}hrs, Fuel: {fuel}L")
+        
+        conn.commit()
+        conn.close()
+        
+        # Return updated table and clear selection
+        return False, '', '', render_refueling_table('all'), []
+    except Exception as e:
+        return True, create_notification(f"❌ Error: {str(e)}", "danger"), '', dash.no_update, dash.no_update
+
+# Cancel edit refuel
+@app.callback(
+    [Output('edit-refuel-modal', 'is_open', allow_duplicate=True),
+     Output('edit-admin-password-input', 'value', allow_duplicate=True)],
+    Input('cancel-edit-btn', 'n_clicks'),
+    prevent_initial_call=True
+)
+def cancel_edit_refuel(n_clicks):
+    """Cancel edit refuel"""
     if n_clicks:
         return False, ''
     raise PreventUpdate
