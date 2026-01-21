@@ -814,7 +814,7 @@ def create_settings_tab(user_data):
         html.Div(id='system-info'),
         
         # Download components
-        dcc.Download(id='download-excel'),
+        dcc.Download(id='download-analytics'),
         dcc.Download(id='download-backup'),
         
         # Notifications
