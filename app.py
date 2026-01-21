@@ -2137,9 +2137,9 @@ def export_analytics(n_clicks, date_from, date_to):
         summary.to_excel(writer, sheet_name='Machine Summary', index=False)
 
     return dcc.send_bytes(
-        output.getvalue(),
-        f"analytics_report_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
-    )
+    lambda out: out.write(output.getvalue()),
+    f"analytics_report_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+)
     
 
 # Import Excel
